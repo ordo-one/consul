@@ -66,13 +66,14 @@ func (t *RadixTree[T]) Delete(key []byte) T {
 	var zero T
 	oldRoot := (*t.root).Clone()
 	l := t.recursiveDelete(oldRoot, &oldRoot, getTreeKey(key), 0)
-	if t.root == nil {
+	if oldRoot == nil {
 		nodeLeaf := t.allocNode(leafType)
-		t.root = &nodeLeaf
+		oldRoot = &nodeLeaf
 	}
 	if l != nil {
 		t.size--
 		old := l.value
+		t.root = oldRoot
 		return old
 	}
 	t.root = oldRoot
