@@ -4,8 +4,6 @@
 package adaptive
 
 type Txn[T any] struct {
-	root *Node[T]
-
 	size uint64
 
 	tree *RadixTree[T]
@@ -14,7 +12,6 @@ type Txn[T any] struct {
 // Txn starts a new transaction that can be used to mutate the tree
 func (t *RadixTree[T]) Txn() *Txn[T] {
 	txn := &Txn[T]{
-		root: t.root,
 		size: t.size,
 		tree: t,
 	}
@@ -30,20 +27,18 @@ func (t *Txn[T]) Get(k []byte) (T, bool) {
 
 func (t *Txn[T]) Insert(key []byte, value T) T {
 	oldVal := t.tree.Insert(key, value)
-	t.root = t.tree.root
 	t.size = t.tree.size
 	return oldVal
 }
 
 func (t *Txn[T]) Delete(key []byte) T {
 	oldVal := t.tree.Delete(key)
-	t.root = t.tree.root
 	t.size = t.tree.size
 	return oldVal
 }
 
 func (t *Txn[T]) Root() Node[T] {
-	return *t.root
+	return *t.tree.root
 }
 
 func (t *Txn[T]) Commit() *RadixTree[T] {
